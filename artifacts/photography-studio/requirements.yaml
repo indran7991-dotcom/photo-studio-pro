@@ -1,0 +1,24 @@
+packages:
+  "framer-motion": "For cinematic page transitions and scroll-reveals essential for a luxury photography feel"
+  "react-hook-form": "For robust booking and contact forms"
+  "@hookform/resolvers": "Zod integration for form validation"
+  "zod": "Schema validation for forms"
+  "date-fns": "For formatting event and booking dates"
+  "clsx": "Utility for constructing className strings"
+  "tailwind-merge": "Utility for merging tailwind classes"
+
+images:
+  - path: "artifacts/photography-studio/public/images/hero-bg.png"
+    description: "Cinematic, moody, and elegant abstract dark background with soft golden light leaks and subtle film grain, suitable for a luxury photography studio hero section"
+    aspect_ratio: "16:9"
+  - path: "artifacts/photography-studio/public/images/logo-mark.png"
+    description: "Minimalist, elegant luxury photography studio logo mark featuring a stylized camera aperture or geometric lens shape in metallic gold on a transparent background"
+    aspect_ratio: "1:1"
+  - path: "artifacts/photography-studio/public/images/texture-dark.png"
+    description: "Subtle dark charcoal seamless texture with very faint gold speckles, resembling high-end art paper"
+    aspect_ratio: "1:1"
+
+notes:
+  - Using generated hooks from @workspace/api-client-react for data fetching.
+  - The design is strictly Dark Luxury with gold accents (Cinzel + Montserrat fonts).
+  - Admin panel is accessible via /admin routes.

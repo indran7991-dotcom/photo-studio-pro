@@ -1,22 +1,30 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Photography Studio API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: bookings
+    description: Booking management
+  - name: contact
+    description: Contact form
+  - name: testimonials
+    description: Testimonials management
+  - name: admin
+    description: Admin panel operations
+  - name: packages
+    description: Photography packages
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +32,191 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /packages:
+    get:
+      operationId: getPackages
+      tags: [packages]
+      summary: Get all photography packages
+      responses:
+        "200":
+          description: List of packages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Package"
+
+  /bookings:
+    get:
+      operationId: getBookings
+      tags: [bookings]
+      summary: Get all bookings (admin)
+      responses:
+        "200":
+          description: List of bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Booking"
+    post:
+      operationId: createBooking
+      tags: [bookings]
+      summary: Create a new booking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBookingRequest"
+      responses:
+        "201":
+          description: Booking created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /bookings/{id}:
+    get:
+      operationId: getBookingById
+      tags: [bookings]
+      summary: Get a booking by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Booking found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateBookingStatus
+      tags: [bookings]
+      summary: Update booking status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBookingStatusRequest"
+      responses:
+        "200":
+          description: Updated booking
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+
+  /contact:
+    post:
+      operationId: submitContact
+      tags: [contact]
+      summary: Submit a contact form message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContactRequest"
+      responses:
+        "201":
+          description: Message submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactMessage"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    get:
+      operationId: getContactMessages
+      tags: [contact]
+      summary: Get all contact messages (admin)
+      responses:
+        "200":
+          description: List of contact messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ContactMessage"
+
+  /testimonials:
+    get:
+      operationId: getTestimonials
+      tags: [testimonials]
+      summary: Get published testimonials
+      responses:
+        "200":
+          description: List of testimonials
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Testimonial"
+    post:
+      operationId: createTestimonial
+      tags: [testimonials]
+      summary: Create a testimonial (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTestimonialRequest"
+      responses:
+        "201":
+          description: Testimonial created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Testimonial"
+
+  /admin/stats:
+    get:
+      operationId: getAdminStats
+      tags: [admin]
+      summary: Get admin dashboard statistics
+      responses:
+        "200":
+          description: Admin stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminStats"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +227,267 @@ components:
       required:
         - status
 
+    Package:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        duration:
+          type: string
+        features:
+          type: array
+          items:
+            type: string
+        category:
+          type: string
+          enum: [portrait, wedding, event, commercial, family]
+        popular:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - description
+        - price
+        - duration
+        - features
+        - category
+        - popular
+        - createdAt
+
+    Booking:
+      type: object
+      properties:
+        id:
+          type: integer
+        customerName:
+          type: string
+        customerEmail:
+          type: string
+        customerPhone:
+          type: string
+        packageId:
+          type: integer
+        packageName:
+          type: string
+        packagePrice:
+          type: number
+        eventDate:
+          type: string
+          format: date
+        eventType:
+          type: string
+        location:
+          type: string
+        notes:
+          type: string
+        status:
+          type: string
+          enum: [pending, confirmed, completed, cancelled]
+        invoiceNumber:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - customerName
+        - customerEmail
+        - customerPhone
+        - packageId
+        - packageName
+        - packagePrice
+        - eventDate
+        - eventType
+        - location
+        - status
+        - invoiceNumber
+        - createdAt
+
+    CreateBookingRequest:
+      type: object
+      properties:
+        customerName:
+          type: string
+          minLength: 2
+        customerEmail:
+          type: string
+          format: email
+        customerPhone:
+          type: string
+          minLength: 7
+        packageId:
+          type: integer
+        eventDate:
+          type: string
+          format: date
+        eventType:
+          type: string
+        location:
+          type: string
+        notes:
+          type: string
+      required:
+        - customerName
+        - customerEmail
+        - customerPhone
+        - packageId
+        - eventDate
+        - eventType
+        - location
+
+    UpdateBookingStatusRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [pending, confirmed, completed, cancelled]
+      required:
+        - status
+
+    ContactRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 2
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        subject:
+          type: string
+        message:
+          type: string
+          minLength: 10
+      required:
+        - name
+        - email
+        - subject
+        - message
+
+    ContactMessage:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        subject:
+          type: string
+        message:
+          type: string
+        read:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - email
+        - subject
+        - message
+        - read
+        - createdAt
+
+    Testimonial:
+      type: object
+      properties:
+        id:
+          type: integer
+        clientName:
+          type: string
+        clientTitle:
+          type: string
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        content:
+          type: string
+        published:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - clientName
+        - clientTitle
+        - rating
+        - content
+        - published
+        - createdAt
+
+    CreateTestimonialRequest:
+      type: object
+      properties:
+        clientName:
+          type: string
+        clientTitle:
+          type: string
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        content:
+          type: string
+        published:
+          type: boolean
+      required:
+        - clientName
+        - clientTitle
+        - rating
+        - content
+
+    AdminStats:
+      type: object
+      properties:
+        totalBookings:
+          type: integer
+        pendingBookings:
+          type: integer
+        confirmedBookings:
+          type: integer
+        completedBookings:
+          type: integer
+        totalRevenue:
+          type: number
+        unreadMessages:
+          type: integer
+        totalTestimonials:
+          type: integer
+      required:
+        - totalBookings
+        - pendingBookings
+        - confirmedBookings
+        - completedBookings
+        - totalRevenue
+        - unreadMessages
+        - totalTestimonials
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        details:
+          type: array
+          items:
+            type: string
+      required:
+        - error
