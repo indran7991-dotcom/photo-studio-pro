@@ -1,5 +1,7 @@
+import "dotenv/config";
 import { db } from "@workspace/db";
 import { packagesTable, testimonialsTable } from "@workspace/db/schema";
+
 
 async function seed() {
   console.log("Seeding database...");
